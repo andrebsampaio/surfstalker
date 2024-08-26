@@ -24,8 +24,6 @@ export async function startRecording() {
     return;
   }
 
-  // Create folder recordings in the root of the project
-  // and save the recorded stream in that folder
   if (!fs.existsSync("recordings")) {
     fs.mkdirSync("recordings");
   }
@@ -37,6 +35,16 @@ export async function startRecording() {
   recordingProcess = ffmpeg(videoSrc)
     .outputOptions("-c:v libvpx-vp9")
     .outputOptions("-crf 30")
+    .on("end", () => {
+      console.log("Recording finished");
+    })
+    .on("error", (error) => {
+      if (error.message.includes("Exiting normally, received signal 2")) {
+        console.log("Recording stopped");
+      } else {
+        console.error("Error recording stream:", error);
+      }
+    })
     .output(outputPath);
 
   recordingProcess.run();
@@ -46,7 +54,8 @@ export async function startRecording() {
 
 export function stopRecording() {
   if (recordingProcess) {
-    recordingProcess.abort();
+    recordingProcess.kill("SIGINT");
+    recordingProcess = null;
   }
   if (browser) {
     browser
