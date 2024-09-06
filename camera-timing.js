@@ -1,4 +1,4 @@
-Cam - Timing - duration(s)
+/* Cam - Timing - duration(s)
 1 - 09:11:07.500 - 5
 Move 2
 2 - 09:11:14.500 - 5
@@ -21,4 +21,45 @@ Move 8
 Move 2
 10 - 09:12:38.500 - 5
 Zooms 5
-...Repeats the same patter but inverse going to 9
+...Repeats the same pattern but inverse going to 9 */
+
+const cameraMovementCycle = [
+  { type: "static", cameraPos: 1, duration: 5000 },
+  { type: "move", duration: 2000, toCameraPos: 2 },
+  { type: "static", cameraPos: 2, duration: 5000 },
+  { type: "move", duration: 2000, toCameraPos: 1 },
+  { type: "static", cameraPos: 1, duration: 5000 },
+  { type: "move", duration: 2000, toCameraPos: 3 },
+  { type: "static", cameraPos: 3, duration: 5000 },
+  { type: "move", duration: 2000, toCameraPos: 4 },
+  { type: "static", cameraPos: 4, duration: 5000 },
+  { type: "move", duration: 4000, toCameraPos: 5 },
+  { type: "static", cameraPos: 5, duration: 5000 },
+  { type: "move", duration: 8000, toCameraPos: 6 },
+  { type: "static", cameraPos: 6, duration: 5000 },
+  { type: "move", duration: 2000, toCameraPos: 7 },
+  { type: "static", cameraPos: 7, duration: 5000 },
+  { type: "move", duration: 6000, toCameraPos: 8 },
+  { type: "static", cameraPos: 8, duration: 5000 },
+  { type: "move", duration: 8000, toCameraPos: 9 },
+  { type: "static", cameraPos: 9, duration: 5000 },
+  { type: "move", duration: 2000, toCameraPos: 10 },
+  { type: "static", cameraPos: 10, duration: 5000 },
+];
+
+
+export function getCurrentCameraForTime(timeForFirstCameraPos, time) {
+  const timeElapsed = time - timeForFirstCameraPos;
+  const cycleDuration = cameraMovementCycle.reduce((acc, { duration }) => acc + duration, 0);
+  const timeInCycle = timeElapsed % cycleDuration;
+
+  let timeAcc = 0;
+  for (let i = 0; i < cameraMovementCycle.length; i++) {
+    const { duration } = cameraMovementCycle[i];
+    timeAcc += duration;
+    if (timeAcc >= timeInCycle) {
+      return cameraMovementCycle[i]
+    }
+  }
+}
+

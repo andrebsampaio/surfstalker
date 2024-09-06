@@ -131,3 +131,4 @@ dist
 
 # Specifc
 recordings/*
+.vscode/launch.json
