@@ -23,6 +23,8 @@ Move 2
 Zooms 5
 ...Repeats the same pattern but inverse going to 9 */
 
+const startTimeInMillis = 1724836267000; // 28-08-2024 09:11:07.500 
+
 const cameraMovementCycle = [
   { type: "static", cameraPos: 1, duration: 5000 },
   { type: "move", duration: 2000, toCameraPos: 2 },
@@ -47,18 +49,26 @@ const cameraMovementCycle = [
   { type: "static", cameraPos: 10, duration: 5000 },
 ];
 
+const reverseCycle = cameraMovementCycle.slice().reverse().map(step => {
+  if (step.type === "move") {
+    return { ...step, toCameraPos: step.toCameraPos, duration: step.duration };
+  }
+  return step;
+});
 
-export function getCurrentCameraForTime(timeForFirstCameraPos, time) {
+const fullCycle = [...cameraMovementCycle, ...reverseCycle];
+
+function getCurrentCameraForTime(timeForFirstCameraPos, time) {
   const timeElapsed = time - timeForFirstCameraPos;
-  const cycleDuration = cameraMovementCycle.reduce((acc, { duration }) => acc + duration, 0);
+  const cycleDuration = fullCycle.reduce((acc, { duration }) => acc + duration, 0);
   const timeInCycle = timeElapsed % cycleDuration;
 
   let timeAcc = 0;
-  for (let i = 0; i < cameraMovementCycle.length; i++) {
-    const { duration } = cameraMovementCycle[i];
+  for (let i = 0; i < fullCycle.length; i++) {
+    const { duration } = fullCycle[i];
     timeAcc += duration;
     if (timeAcc >= timeInCycle) {
-      return cameraMovementCycle[i]
+     return fullCycle[i];
     }
   }
 }
