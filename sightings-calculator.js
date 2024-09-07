@@ -3,8 +3,8 @@ import GPXExtractor from "./gpx-coordinate-extractor.js";
 import { getCurrentCameraForTime } from "./camera-timing.js";
 import { point } from "@turf/turf";
 
-const kmlFilePath = process.env.KML_FILE_PATH;
-const gpxFilePath = process.env.GPX_FILE_PATH;
+const kmlFilePath = './camera-fovs.kml';
+const gpxFilePath = './test_data.gpx';
 
 export async function getSightings() {
     const kmlPolygons = await KMLExtractor.processKMLFile(kmlFilePath);
@@ -20,11 +20,13 @@ export async function getSightings() {
             const cameraId = polygon.name[0];
             const curentCamera = getCurrentCameraForTime(coord.time);
 
-            if (cameraId == curentCamera.cameraPos) {
-                matchingSightings.push({ coord, cameraId });
+            if (cameraId == curentCamera.cameraPos || cameraId == curentCamera.toCameraPos) {
+                matchingSightings.push({ coord, curentCamera });
             }
         }
     });
 
     return matchingSightings;
 }
+
+getSightings()
